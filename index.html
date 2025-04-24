@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Bosquejo Visual - Sistema Restaurante</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: darkred;
+    }
+    .panel {
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      background-color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .panel h2 {
+      color: #333;
+      margin-top: 0;
+    }
+    .campo {
+      margin-left: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Bosquejo Visual del Sistema de Restaurante</h1>
+
+  <div class="panel">
+    <h2>Login</h2>
+    <div class="campo">- Usuario</div>
+    <div class="campo">- Contraseña</div>
+    <div class="campo">[ Botón Iniciar sesión ]</div>
+  </div>
+
+  <div class="panel">
+    <h2>Panel Principal</h2>
+    <div class="campo">[ Gestión de Productos ]</div>
+    <div class="campo">[ Gestión de Platos ]</div>
+    <div class="campo">[ Registro de Comandas ]</div>
+    <div class="campo">[ Ver Descartes ]</div>
+    <div class="campo">[ Cierre de Día ]</div>
+  </div>
+
+  <div class="panel">
+    <h2>Gestión de Productos</h2>
+    <div class="campo">- Nombre del producto</div>
+    <div class="campo">- Unidad de medida</div>
+    <div class="campo">- Stock actual</div>
+    <div class="campo">- Stock mínimo</div>
+    <div class="campo">- Precio unitario</div>
+    <div class="campo">[ Agregar / Editar / Eliminar Producto ]</div>
+  </div>
+
+  <div class="panel">
+    <h2>Gestión de Platos</h2>
+    <div class="campo">- Nombre del plato</div>
+    <div class="campo">- Precio de venta</div>
+    <div class="campo">- Ingredientes (productos + cantidad)</div>
+    <div class="campo">[ Agregar / Editar / Eliminar Plato ]</div>
+  </div>
+
+  <div class="panel">
+    <h2>Registro de Comandas</h2>
+    <div class="campo">- Fecha y hora</div>
+    <div class="campo">- Mesa</div>
+    <div class="campo">- Número de comensales</div>
+    <div class="campo">- Usuario (camarero)</div>
+    <div class="campo">- Platos pedidos (con cantidad)</div>
+    <div class="campo">[ Guardar Comanda ]</div>
+  </div>
+
+  <div class="panel">
+    <h2>Descarte</h2>
+    <div class="campo">- Producto descartado</div>
+    <div class="campo">- Cantidad</div>
+    <div class="campo">- Fecha</div>
+    <div class="campo">- Motivo</div>
+    <div class="campo">[ Registrar Descarte ]</div>
+  </div>
+
+  <div class="panel">
+    <h2>Cierre del Día</h2>
+    <div class="campo">- Ver resumen de comandas</div>
+    <div class="campo">- Actualizar stock según platos vendidos</div>
+    <div class="campo">[ Generar cierre / Exportar datos ]</div>
+  </div>
+
+</body>
+</html>
