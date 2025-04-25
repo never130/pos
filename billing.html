@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Facturación</title>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Sección de categorías -->
+        <div class="section" id="categorias">
+            <h3>Categorías</h3>
+            <div id="categoria-list"></div>
+        </div>
+
+        <!-- Sección de productos -->
+        <div class="section" id="productos">
+            <h3>Productos</h3>
+            <div id="producto-list"></div>
+        </div>
+
+        <!-- Sección de factura -->
+        <div class="section" id="factura">
+            <h3>Factura</h3>
+            <ul id="bill-list"></ul>
+            <p>Total: $<span id="total">0</span></p>
+            <!-- Cambiado a id="clear-bill-btn" y eliminado el onclick inline -->
+            <button id="clear-bill-btn" class="action-button">Limpiar Factura</button>
+        </div>
+    </div>
+
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            height: 100vh;
+        }
+
+        .section {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid #ddd;
+        }
+
+        h3 {
+            text-align: center;
+            margin-top: 0;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .action-button {
+            background-color: #f44336;
+            margin-top: 20px;
+        }
+
+        .action-button:hover {
+            background-color: #d32f2f;
+        }
+
+        .card {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .card img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+        }
+
+        #factura ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #factura li {
+            padding: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+        }
+
+        .category-button {
+            margin-bottom: 10px;
+            background-color: #5b7db1;
+        }
+
+        .bill-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .product-price {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: white;
+        }
+
+        .product-card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .product-name {
+            font-weight: bold;
+            margin: 8px 0;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        var billItems = []; // Array to store the items in the bill
+        var totalAmount = 0; // Variable to store the total amount
+
+        // Load categories and products on page load
+        function loadCategories() {
+            $.ajax({
+                url: 'get_categories.php',
+                type: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    // Limpiar el contenedor de categorías
+                    $('#categoria-list').empty();
+
+                    // Si la respuesta es un array
+                    if (Array.isArray(response)) {
+                        // Generar botones para cada categoría
+                        response.forEach(function (category) {
+                            $('#categoria-list').append(
+                                `<button class="category-button" onclick="loadItems('${category}')">${category}</button>`
+                            );
+                        });
+
+                        // Añadir botón para mostrar todos los productos
+                        $('#categoria-list').append(
+                            `<button class="category-button" onclick="loadItems('')">Todos los productos</button>`
+                        );
+                    } else {
+                        // Mostrar mensaje si no hay categorías
+                        $('#categoria-list').html('<p>No se encontraron categorías</p>');
+                    }
+                },
+                error: function () {
+                    $('#categoria-list').html('<p>Error al cargar las categorías</p>');
+                }
+            });
+        }
+
+        function loadItems(categoria = '') {
+            $.ajax({
+                url: 'get_items.php',
+                type: 'GET',
+                data: { categoria: categoria },
+                dataType: 'json',
+                success: function (response) {
+                    // Limpiar el contenedor de productos
+                    $('#producto-list').empty();
+
+                    // Si la respuesta es un array
+                    if (Array.isArray(response)) {
+                        if (response.length === 0) {
+                            $('#producto-list').html('<p>No hay productos en esta categoría</p>');
+                            return;
+                        }
+
+                        // Generar tarjetas para cada producto
+                        response.forEach(function (product) {
+                            // Escapar comillas en el nombre para evitar problemas con el onclick
+                            const safeProductName = product.name.replace(/'/g, "\\'");
+
+                            $('#producto-list').append(`
+                                <div class="product-card" onclick="addtoBill('${safeProductName}', ${product.price})">
+                                    <img src="${product.image_path}" alt="${product.name}" class="product-image" onerror="this.src='placeholder.png'">
+                                    <div class="product-name">${product.name}</div>
+                                    <div class="product-price">$${parseFloat(product.price).toLocaleString('es-CO')}</div>
+                                </div>
+                            `);
+                        });
+                    } else {
+                        // Mostrar mensaje si no hay productos
+                        $('#producto-list').html('<p>No se encontraron productos</p>');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error en la solicitud AJAX:", error);
+                    $('#producto-list').html('<p>Error al cargar los productos</p>');
+                }
+            });
+        }
+
+        // Add item to bill
+        function addtoBill(itemName, itemPrice) {
+            billItems.push({ name: itemName, price: itemPrice });
+            totalAmount += parseFloat(itemPrice);
+            updateBill();
+        }
+
+        // Update Bill
+        function updateBill() {
+            $('#bill-list').empty(); // Clear the bill list
+
+            // Agrupar items por nombre para mostrar cantidad
+            const groupedItems = {};
+
+            billItems.forEach(function (item) {
+                if (groupedItems[item.name]) {
+                    groupedItems[item.name].quantity++;
+                    groupedItems[item.name].subtotal += parseFloat(item.price);
+                } else {
+                    groupedItems[item.name] = {
+                        price: parseFloat(item.price),
+                        quantity: 1,
+                        subtotal: parseFloat(item.price)
+                    };
+                }
+            });
+
+            // Mostrar items agrupados
+            for (const [name, details] of Object.entries(groupedItems)) {
+                $('#bill-list').append(`
+                    <li class="bill-item">
+                        <span>${details.quantity}x ${name}</span>
+                        <span class="price">$${details.subtotal.toLocaleString('es-CO')}</span>
+                    </li>
+                `);
+            }
+
+            // Actualizar el total
+            $('#total').text(totalAmount.toLocaleString('es-CO'));
+        }
+
+        // Clear bill - función revisada
+        function clearBill() {
+            console.log("Limpiando factura...");
+            billItems = [];
+            totalAmount = 0;
+            updateBill();
+        }
+
+        // On page load, fetch categories and all items
+        $(document).ready(function () {
+            // Iniciar carga de datos
+            loadCategories();
+            loadItems();
+
+            // Añadir event listener para el botón de limpiar factura usando jQuery
+            $(document).on('click', '#clear-bill-btn', function () {
+                clearBill();
+            });
+        });
+    </script>
+
+</body>
+
+</html>
